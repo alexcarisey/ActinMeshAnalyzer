@@ -22,7 +22,7 @@ function varargout = ActinAnalyzerNew(varargin)
 
 % Edit the above text to modify the response to help ActinAnalyzerNew
 
-% Last Modified by GUIDE v2.5 22-Aug-2014 12:02:55
+% Last Modified by GUIDE v2.5 17-Oct-2017 23:40:14
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -56,6 +56,8 @@ axes(handles.axes1); axis off
 
 % Choose default command line output for ActinAnalyzerNew
 handles.output = hObject;
+
+handles.LUTs = load('LUTs.mat','-mat');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1386,6 +1388,7 @@ function HoleSizeHeatmap_Callback(hObject, eventdata, handles)
 % hObject    handle to HoleSizeHeatmap (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
 Image=get(handles.SelectRectangle,'UserData');
 ImageSize=size(Image);
 PixelWidth=str2double(get(handles.PixelSpacing,'String'))./1000;
@@ -1436,7 +1439,7 @@ elseif Mode==2
     RSqMax=round(log(LinMaxHole));
 end
     
-Cmap2=colormap(jet(255));
+Cmap2=colormap(handles.usercolormap);
 IndexC=zeros(size(AreasC));
 IndexP=zeros(size(AreasP));
 if Mode==1
@@ -1482,6 +1485,8 @@ imshow(Image,CmapFull); hold on
 %colorbar % Flag Alex, heatmap colorbar
 RGBim=ind2rgb(Image,CmapFull);
 set(handles.HoleSizeHeatmap,'UserData',RGBim);
+
+colorbar('TickLabels',{''})
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1573,7 +1578,7 @@ ImageSize=size(Image);
 Cmap1=colormap(gray(256));
 CutOffDistanceTransforms=get(handles.ViewPenetration,'UserData');
 Cimage=CutOffDistanceTransforms{3};
-Cmap2=colormap(jet(255));
+Cmap2=colormap(handles.usercolormap);
 
 Inversion=zeros(size(Image));
 Inversion(Cimage==0)=1;
@@ -1589,6 +1594,8 @@ RGBim=ind2rgb(Image,CmapFull);
 CutOffDistanceTransforms{4}=RGBim;
 save([tempdir,'CutOff.mat'],'CutOffDistanceTransforms')
 set(handles.ViewPenetration,'UserData',CutOffDistanceTransforms);
+
+colorbar('TickLabels',{''})
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1759,3 +1766,68 @@ set(handles.ThresholdSlider,'UserData',Pos2);
 
 % Update handles structure
 guidata(hObject, handles);
+
+
+% --- Executes on selection change in colormap_selection.
+function colormap_selection_Callback(hObject, eventdata, handles)
+% hObject    handle to colormap_selection (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns colormap_selection contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from colormap_selection
+
+current_colormap = get(hObject,'Value');
+
+switch current_colormap
+    case 1
+        
+    case 2
+        handles.usercolormap = handles.LUTs.cmap_Blu2Yel;
+    case 3
+        handles.usercolormap = handles.LUTs.cmap_Bubblegum;
+    case 4
+        handles.usercolormap = handles.LUTs.cmap_DavLUT;
+    case 5
+        handles.usercolormap = handles.LUTs.cmap_DavLUTInverted;
+    case 6
+        handles.usercolormap = handles.LUTs.cmap_DavLUTBright;
+    case 7
+        handles.usercolormap = handles.LUTs.cmap_DavLUTBrightInverted;
+    case 8
+        handles.usercolormap = handles.LUTs.cmap_DavFire;
+    case 9
+        handles.usercolormap = handles.LUTs.cmap_Candy;
+    case 10
+        handles.usercolormap = handles.LUTs.cmap_CandyBright;
+    case 11
+        handles.usercolormap = handles.LUTs.cmap_CandyBrightInverted;
+    case 12
+        handles.usercolormap = handles.LUTs.cmap_PeachPassion;
+    case 13
+        handles.usercolormap = handles.LUTs.cmap_Parula;
+    case 14
+        handles.usercolormap = handles.LUTs.cmap_CharleyHorse;
+    case 15
+        handles.usercolormap = handles.LUTs.cmap_MerryLUTmas;
+    case 16
+        handles.usercolormap = handles.LUTs.cmap_Jet;
+    case 17
+        handles.usercolormap = handles.LUTs.cmap_VioletCrumble;
+end
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function colormap_selection_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to colormap_selection (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
